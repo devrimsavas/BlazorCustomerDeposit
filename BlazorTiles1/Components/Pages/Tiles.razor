@@ -1,0 +1,88 @@
+@page "/tiles"
+@using Microsoft.AspNetCore.Mvc
+@using System.Security.Cryptography.X509Certificates
+@rendermode InteractiveServer
+@using BlazorTiles1.Models;
+
+<PageTitle>Tiles</PageTitle>
+<h1 class="text-center">BANK </h1>
+<div class="container">
+    <div id="form-container" class="container border p-4 shadow bg bg-warning rounded">
+        <form>
+            <label>Name </label>
+            <input  type="text" class="form-control" @bind="NameInput" />
+            <label>Deposit</label>
+            <input type="number" class="form-control" id="deposit-input" @bind="DepositInput"/>
+            <button type="button" class="btn btn-primary mt-3"  @onclick="createCustomer">Submit Customer</button>
+        </form>
+    </div>
+    <div class="container">
+        <div id="customer-table-container">
+            <table class="table mt-2">
+                <thead>
+                    <tr>
+                        <th>Id </th>
+                        <th>Account No</th>
+                        <th>Name</th>
+                        <th>Deposit</th>
+                    </tr>
+                </thead>
+                <tbody id="customerTBody">
+                    <!--dynamic-->
+                    @foreach(var c in customers.People) 
+                    {
+                        <tr @key=c.Id>
+                            <td>@c.Id</td>
+                            <td>@c.AccountNo</td>
+                            <td>@c.Name</td>
+                            <td>@c.Deposit</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    @if(ErrorMessage!=null)
+    {
+        <div class="alert alert-danger">
+            @ErrorMessage
+        </div>
+    }
+</div>
+
+@code {
+    
+    public string NameInput {get;set;}=string.Empty;    
+    public decimal DepositInput {get;set;}
+    public static Customers customers=new Customers();
+    string? ErrorMessage;
+    public void createCustomer() 
+    {
+        
+        NewPersonInput newPersonInput=new NewPersonInput(this.NameInput,this.DepositInput);
+        if (newPersonInput.Name.Length<5) {
+            ErrorMessage="Person Name Must be minimum 5 chars";
+            return;
+        }
+        
+        try {
+            ErrorMessage=null;
+            customers.AddPerson(newPersonInput);
+            this.NameInput="";
+            this.DepositInput=0;
+
+
+        }
+        catch(Exception ex)
+        {
+            ErrorMessage=ex.Message;
+        }
+        
+        
+         
+    }
+}
+
+
